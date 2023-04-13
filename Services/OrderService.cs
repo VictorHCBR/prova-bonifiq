@@ -2,27 +2,14 @@
 
 namespace ProvaPub.Services
 {
-	public class OrderService
-	{
-		public async Task<Order> PayOrder(string paymentMethod, decimal paymentValue, int customerId)
-		{
-			if (paymentMethod == "pix")
-			{
-				//Faz pagamento...
-			}
-			else if (paymentMethod == "creditcard")
-			{
-				//Faz pagamento...
-			}
-			else if (paymentMethod == "paypal")
-			{
-				//Faz pagamento...
-			}
+    public class OrderService
+    {
 
-			return await Task.FromResult( new Order()
-			{
-				Value = paymentValue
-			});
-		}
-	}
+        public async Task<Order> Pay(string paymentMethod, decimal paymentValue, int customerId)
+        {
+            var payment = PaymentMethodFactory.Instantiate(paymentMethod);
+
+            return await payment.PayOrder(paymentValue, customerId);
+        }
+    }
 }

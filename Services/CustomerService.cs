@@ -15,7 +15,24 @@ namespace ProvaPub.Services
 
         public CustomerList ListCustomers(int page)
         {
-            return new CustomerList() { HasNext = false, TotalCount = 10, Customers = _ctx.Customers.ToList() };
+            var customers = new List<Customer>();
+
+            int idx, bound;
+            idx = page == 1 ? 0 : (page - 1) * 10;
+            bound = page * 10;
+
+            for (int i = idx; i < bound; i++)
+            {
+                customers.Add(_ctx.Customers.ToList()[i]);
+            }
+
+
+            return new CustomerList()
+            {
+                HasNext = false,
+                TotalCount = 10,
+                Customers = customers
+            };
         }
 
         public async Task<bool> CanPurchase(int customerId, decimal purchaseValue)
@@ -26,7 +43,7 @@ namespace ProvaPub.Services
 
             //Business Rule: Non registered Customers cannot purchase
             var customer = await _ctx.Customers.FindAsync(customerId);
-            if (customer == null) throw new InvalidOperationException($"Customer Id {customerId} does not exists");
+            if (customer == null) throw new InvalidOperationException($"Customer Id {customerId} does not exist");
 
             //Business Rule: A customer can purchase only a single time per month
             var baseDate = DateTime.UtcNow.AddMonths(-1);
